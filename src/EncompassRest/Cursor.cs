@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EncompassRest.Utilities;
+using Newtonsoft.Json;
 
 namespace EncompassRest
 {
@@ -129,13 +130,20 @@ namespace EncompassRest
         /// <inheritdoc/>
         public IEnumerable<string> Fields { get; }
 
-        internal Cursor(ApiObject apiObject, EncompassRestClient client, string? cursorId, int count, IEnumerable<string>? fields)
+        /// <summary>
+        /// Include Archived Loans
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? IncludeArchivedLoans { get; }
+        
+        internal Cursor(ApiObject apiObject, EncompassRestClient client, string? cursorId, int count, IEnumerable<string>? fields, bool? includeArchivedLoans = null)
         {
             _apiObject = apiObject;
             Client = client;
             CursorId = cursorId;
             Count = count;
             Fields = fields ?? Array<string>.Empty;
+            IncludeArchivedLoans = includeArchivedLoans;
         }
 
         /// <inheritdoc/>
@@ -177,7 +185,7 @@ namespace EncompassRest
             {
                 queryParameters.Add("limit", limit.ToString());
             }
-            var content = JsonStreamContent.Create(new { Fields = fields ?? Fields });
+            var content = JsonStreamContent.Create(new { Fields = fields ?? Fields, IncludeArchivedLoans });
 
             return _apiObject.PostAsync<List<TItem>>(null, queryParameters.ToString(), content, nameof(GetItemsAsync), null, cancellationToken);
         }
@@ -205,7 +213,7 @@ namespace EncompassRest
             {
                 queryParameters.Add("limit", limit.ToString());
             }
-            var content = JsonStreamContent.Create(new { Fields = fields ?? Fields });
+            var content = JsonStreamContent.Create(new { Fields = fields ?? Fields, IncludeArchivedLoans });
 
             return _apiObject.PostRawAsync(null, queryParameters.ToString(), content, nameof(GetItemsRawAsync), null, cancellationToken);
         }

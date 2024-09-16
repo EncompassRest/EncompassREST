@@ -148,7 +148,7 @@ namespace EncompassRest.LoanPipeline
                     }
                     cursorId = cursorIds.First();
                 }
-                return new LoanPipelineCursor(Client, cursorId, count, parameters.Fields);
+                return new LoanPipelineCursor(Client, cursorId, count, parameters.Fields, parameters.IncludeArchivedLoans);
             });
         }
 
